@@ -1,28 +1,28 @@
-import Locations from 'src/Model/Locations'
+import Locations from "src/lib/schema/locationsSchema";
 
-import connectToDatabase from '../../lib/mongodb'
+import connectToDatabase from "../../lib/mongodb";
 
 export default async function handler(req, res) {
   try {
-    const { category, search } = req.query
+    const { category, search } = req.query;
 
     // חיבור למסד נתונים
-    await connectToDatabase()
+    await connectToDatabase();
 
     // שליפת מיקומים
-    const locations = await Locations.find(filter).toArray()
-    console.log('🚀 ~ handler ~ locations:', locations)
+    const locations = await Locations.find(filter).toArray();
+    console.log("🚀 ~ handler ~ locations:", locations);
 
     // סגירת החיבור
-    await client.close()
+    await client.close();
 
     // החזרת התוצאות
-    res.status(200).json(locations)
+    res.status(200).json(locations);
   } catch (error) {
-    console.error('API error:', error)
+    console.error("API error:", error);
     res.status(500).json({
-      error: 'Failed to fetch locations',
+      error: "Failed to fetch locations",
       details: error.message,
-    })
+    });
   }
 }
