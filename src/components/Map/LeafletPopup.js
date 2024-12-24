@@ -42,20 +42,20 @@ const LeafletPopup = ({ handlePopupClose, handleOpenLocation, color, icon, item,
             {/* todo: new component for button group */}
             <div className="mt-6 flex flex-row justify-between gap-2 p-2">
               <Button
-                className="gap-2 bg-primary text-white"
-                onClick={() => handleOpenLocation()}
-                small
-              >
-                <ChevronRight size={AppConfig.ui.menuIconSize} />
-                Open
-              </Button>
-              <Button
                 className="gap-2 bg-secondary text-white"
                 onClick={() => handlePopupClose()}
                 small
               >
-                Close
                 <ChevronLeft size={AppConfig.ui.menuIconSize} />
+                Close
+              </Button>
+              <Button
+                className="gap-2 bg-primary text-white"
+                onClick={() => handleOpenLocation()}
+                small
+              >
+                Open
+                <ChevronRight size={AppConfig.ui.menuIconSize} />
               </Button>
             </div>
           </div>
