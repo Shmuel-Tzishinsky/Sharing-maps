@@ -38,7 +38,7 @@ export const CenterButton = ({ center, zoom }) => {
     <button
       type="button"
       style={{ zIndex: 400 }}
-      className={`button absolute top-2 right-3 rounded bg-white p-2 shadow-md ${
+      className={`button absolute top-[182px] left-3 rounded bg-white p-2 shadow-md ${
         isTouched ? "text-dark" : "text-light"
       } `}
       onClick={() => handleClick()}

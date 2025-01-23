@@ -1,4 +1,4 @@
-import { Compass, Home, SearchIcon, Upload } from "lucide-react";
+import { Compass, Home, SearchIcon, Upload, MapPin } from "lucide-react";
 
 import { AppConfig, NavMenuVariant } from "../../lib/AppConfig";
 import NavMenuItem from "./NavMenuItem";
@@ -17,11 +17,7 @@ const NavMenu = ({ variant = NavMenuVariant.INTRO }) => {
       <NavMenuItem href="/" label="Intro" icon={<Home size={navIconSize} />} />
       <NavMenuItem href="/map" label="Map Example" icon={<Compass size={navIconSize} />} />
       <NavMenuItem href="/uploadFile" label="Upload file" icon={<Upload size={navIconSize} />} />
-      <NavMenuItem
-        href="/SearchIcon"
-        label="Search Icon"
-        icon={<SearchIcon size={navIconSize} />}
-      />
+      <NavMenuItem href="/gptTest" label="GPT test" icon={<MapPin size={navIconSize} />} />
     </ul>
   );
 };

@@ -1,7 +1,5 @@
 import Head from "next/head";
 
-import Map from "#components/Map";
-
 const MapPage = () => (
   <div>
     <Head>
@@ -19,7 +17,7 @@ const MapPage = () => (
       visually enhanced by tailwind and lucide-react icons."
       />
     </Head>
-    <Map />
+    <h1>SOME TEST</h1>
   </div>
 );
 

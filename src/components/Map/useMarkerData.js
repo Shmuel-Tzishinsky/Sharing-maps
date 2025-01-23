@@ -12,39 +12,42 @@ const useMarkerData = ({ locations, map, viewportWidth, viewportHeight }) => {
 
   // get bounds of all markers
   const allMarkerBounds = useMemo(() => {
-    if (!locations || !leafletLib) return undefined;
+    if (locations.length == 0 || !leafletLib) return undefined;
 
     const coordsSum = [];
-    locations.forEach((item) => {
-      coordsSum.push(item.position);
+    locations.forEach((obj) => {
+      obj.markers.forEach((item) => {
+        coordsSum.push(item.position);
+      });
     });
     return leafletLib.latLngBounds(coordsSum);
   }, [leafletLib, locations]);
 
-  const clustersByCategory = useMemo(() => {
-    if (!locations) return undefined;
-    const groupedLocations = locations.reduce((acc, location) => {
-      const { category } = location
-      if (!acc[category]) {
-        acc[category] = []
-      }
-      acc[category].push(location)
-      return acc
-    }, {})
+  // const clustersByCategory = useMemo(() => {
+  //   if (!locations) return undefined;
+  //   const groupedLocations = locations.reduce((acc, location) => {
+  //     const { category } = location;
+  //     if (!acc[category]) {
+  //       acc[category] = [];
+  //     }
+  //     acc[category].push(location);
+  //     return acc;
+  //   }, {});
 
-    const mappedClusters = Object.keys(groupedLocations).map((key) => ({
-      category: Number(key),
-      markers: groupedLocations[key],
-    }));
+  //   const mappedClusters = Object.keys(groupedLocations).map((key) => ({
+  //     category: key,
+  //     markers: groupedLocations[key],
+  //   }));
 
-    return mappedClusters;
-  }, [locations]);
+  //   return mappedClusters;
+  // }, [locations]);
 
   // auto resize map to fit all markers on viewport change
   // it's crucial to set viewport size as dependecy to trigger the map resize
   useEffect(() => {
     if (!allMarkerBounds || !map) return;
     if (!viewportWidth || !viewportHeight) return;
+    if (locations.length == 0) return;
 
     map.invalidateSize();
     setAllMarkersBoundCenter({
@@ -53,8 +56,7 @@ const useMarkerData = ({ locations, map, viewportWidth, viewportHeight }) => {
     });
   }, [allMarkerBounds, map, viewportWidth, viewportHeight]);
 
-  // console.log("🚀 ~ useMarkerData ~  clustersByCategory,:",  clustersByCategory )
-  return { clustersByCategory, allMarkersBoundCenter };
+  return { allMarkersBoundCenter };
 };
 
 export default useMarkerData;
