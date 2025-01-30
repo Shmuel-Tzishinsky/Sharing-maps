@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Popup } from "react-leaflet";
 
@@ -14,6 +14,7 @@ const LeafletPopup = ({
   color,
   icon,
   item,
+  editMarkerFunc,
   ...props
 }) => {
   const { title, address, description, image } = item;
@@ -38,6 +39,15 @@ const LeafletPopup = ({
           >
             <X size={AppConfig.ui.markerIconSize} />
           </Button>
+          {typeof editMarkerFunc === "function" && (
+            <Button
+              onClick={() => editMarkerFunc((prev) => ({ ...prev, editMarker: item }))}
+              className="absolute left-3 justify-center pt-3 cursor-pointer text-[gray] transition-all hover:text-dark"
+              small
+            >
+              <Settings size={AppConfig.ui.markerIconSize / 1.7} />
+            </Button>
+          )}
           <div className="absolute left-0 top-0 mt-8 flex w-full justify-center">
             <MarkerIconWrapper color={color} icon={icon} background={background} isPopUp={true} />
           </div>
@@ -53,7 +63,7 @@ const LeafletPopup = ({
             />
             {image && (
               <div className="p-1">
-                <img src={image.replace("NULL", "")} alt={title} />
+                <img src={image} alt={title} />
               </div>
             )}
             {/* todo: new component for button group */}

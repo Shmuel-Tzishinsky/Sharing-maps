@@ -2,79 +2,63 @@ import React, { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "#components/ui/dialog";
 import { Upload, X } from "lucide-react";
 
-const FileUploadDialog = ({ isOpen, setIsOpen, data, setData }) => {
+const FileUploadDialog = ({ isOpen, setIsOpen, mapData, setMapData }) => {
   const fileInputRef = useRef(null);
 
-  const handleFileChange = async (event) => {
-    const selectedFiles = Array.from(event.target.files);
-
+  const UpdateTheState = async (selectedFiles) => {
     for (const file of selectedFiles) {
       const fileContent = await file.text();
       const content = JSON.parse(fileContent);
 
-      setData((prevData) => {
-        if (prevData.some((item) => item.category === content.name)) {
-          return prevData; // למנוע כפילויות
+      setMapData((prev) => {
+        if (prev.data.some((item) => item.category === content.name)) {
+          return prev; // למנוע כפילויות
         }
 
-        return [
-          ...prevData,
-          {
-            markers: content.features.map((mark) => ({
-              id: mark.geometry.coordinates[1] + mark.geometry.coordinates[0],
-              position: [mark.geometry.coordinates[1], mark.geometry.coordinates[0]],
+        return {
+          ...prev,
+          data: [
+            ...prev.data,
+            {
+              markers: content.features.map((mark) => ({
+                id: mark.geometry.coordinates[1] + mark.geometry.coordinates[0],
+                position: [mark.geometry.coordinates[1], mark.geometry.coordinates[0]],
+                category: content.name,
+                title: mark.properties["שם"] || null,
+                description: mark.properties["תיאור"] || null,
+                image: mark.properties["תמונה"] || null,
+                address: mark.properties["כתובת"] || null,
+                showLabel: false,
+              })),
+              showLabelInAll: false,
               category: content.name,
-              title: mark.properties["שם"] || null,
-              description: mark.properties["תיאור"] || null,
-              image: mark.properties["תמונה"] || null,
-              address: mark.properties["כתובת"] || null,
-            })),
-            category: content.name,
-            color: "#ffffff",
-            background: "#333333",
-            icon: "MapPin",
-          },
-        ];
+              color: "#ffffff",
+              background: "#333333",
+              icon: "MapPin",
+            },
+          ],
+        };
       });
     }
+  };
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files);
+
+    UpdateTheState(selectedFiles);
   };
 
   const handleDrop = async (event) => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
 
-    for (const file of droppedFiles) {
-      const fileContent = await file.text();
-      const content = JSON.parse(fileContent);
-
-      setData((prevData) => {
-        if (prevData.some((item) => item.category === content.name)) {
-          return prevData; // למנוע כפילויות
-        }
-
-        return [
-          ...prevData,
-          {
-            markers: content.features.map((mark) => ({
-              position: [mark.geometry.coordinates[1], mark.geometry.coordinates[0]],
-              category: content.name,
-              title: mark.properties["שם"] || null,
-              description: mark.properties["תיאור"] || null,
-              image: mark.properties["תמונה"] || null,
-              address: mark.properties["כתובת"] || null,
-            })),
-            category: content.name,
-            color: "#ffffff",
-            background: "#333333",
-            icon: "MapPin",
-          },
-        ];
-      });
-    }
+    UpdateTheState(droppedFiles);
   };
 
   const removeFile = (index) => {
-    setData((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setMapData((prev) => {
+      return { ...prev, data: prev.data.filter((_, i) => i !== index) };
+    });
   };
 
   return (
@@ -105,9 +89,9 @@ const FileUploadDialog = ({ isOpen, setIsOpen, data, setData }) => {
         </div>
 
         {/* הצגת הקבצים שנבחרו */}
-        {data.length > 0 && (
+        {mapData.data.length > 0 && (
           <div className="mt-4 space-y-2">
-            {data.map((file, index) => (
+            {mapData.data.map((file, index) => (
               <div
                 key={index}
                 className="p-2 bg-gray-100 rounded-lg flex items-center justify-between"
@@ -134,7 +118,7 @@ const FileUploadDialog = ({ isOpen, setIsOpen, data, setData }) => {
           </button>
           <button
             className="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
-            disabled={data.length === 0}
+            disabled={mapData.data.length === 0}
             onClick={() => setIsOpen(false)}
           >
             העלאה

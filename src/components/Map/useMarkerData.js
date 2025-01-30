@@ -44,17 +44,21 @@ const useMarkerData = ({ locations, map, viewportWidth, viewportHeight }) => {
 
   // auto resize map to fit all markers on viewport change
   // it's crucial to set viewport size as dependecy to trigger the map resize
-  useEffect(() => {
-    if (!allMarkerBounds || !map) return;
-    if (!viewportWidth || !viewportHeight) return;
-    if (locations.length == 0) return;
 
-    map.invalidateSize();
-    setAllMarkersBoundCenter({
-      minZoom: map.getBoundsZoom(allMarkerBounds),
-      centerPos: [allMarkerBounds.getCenter().lat, allMarkerBounds.getCenter().lng],
-    });
-  }, [allMarkerBounds, map, viewportWidth, viewportHeight]);
+  // bind this
+  // useEffect(() => {
+  //   if (!allMarkerBounds || !map || Object.keys(allMarkerBounds).length === 0) return;
+  //   if (!viewportWidth || !viewportHeight) return;
+  //   if (locations.length == 0) return;
+
+  //   map.invalidateSize();
+  //   console.log(allMarkerBounds);
+
+  //   setAllMarkersBoundCenter({
+  //     minZoom: map.getBoundsZoom(allMarkerBounds),
+  //     centerPos: [allMarkerBounds.getCenter().lat, allMarkerBounds.getCenter().lng],
+  //   });
+  // }, [allMarkerBounds, map, viewportWidth, viewportHeight]);
 
   return { allMarkersBoundCenter };
 };

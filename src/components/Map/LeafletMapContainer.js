@@ -21,18 +21,18 @@ export const LeafletMapContainer = ({ children, ...props }) => {
       {...props}
     >
       <LayersControl position="topleft" className="bg-dark">
-        <LayersControl.BaseLayer name="Google - מפה רגילה">
-          <TileLayer
-            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-            subdomains={["mt0", "mt1", "mt2", "mt3"]}
-            attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-          />
-        </LayersControl.BaseLayer>
         {/* שכבת ברירת מחדל - OpenStreetMap */}
         <LayersControl.BaseLayer checked name="מפת רחובות">
           <TileLayer
             url="https://tile.openstreetmap.org/{z}/{x}/{y}.png?lang=he"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          />
+        </LayersControl.BaseLayer>
+        <LayersControl.BaseLayer name="Google - מפה רגילה">
+          <TileLayer
+            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+            subdomains={["mt0", "mt1", "mt2", "mt3"]}
+            attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
           />
         </LayersControl.BaseLayer>
 

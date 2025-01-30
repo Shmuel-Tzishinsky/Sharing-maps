@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useResizeDetector } from "react-resize-detector";
 
 import { AppConfig } from "../../lib/AppConfig";
@@ -13,18 +13,15 @@ const LeafletCluster = dynamic(
     ssr: false,
   }
 );
-const CenterToMarkerButton = dynamic(
-  async () => (await import("../Map/ui/CenterButton")).CenterButton,
+const CustomMarker = dynamic(async () => (await import("../Map/LeafletMarker")).CustomMarker, {
+  ssr: false,
+});
+const MapToggleButtons = dynamic(
+  async () => (await import("../Map/ui/MapToggleButtons")).MapToggleButtons,
   {
     ssr: false,
   }
 );
-const CustomMarker = dynamic(async () => (await import("../Map/LeafletMarker")).CustomMarker, {
-  ssr: false,
-});
-const LocateButton = dynamic(async () => (await import("../Map/ui/LocateButton")).LocateButton, {
-  ssr: false,
-});
 const LeafletMapContainer = dynamic(
   async () => (await import("../Map/LeafletMapContainer")).LeafletMapContainer,
   {
@@ -32,7 +29,7 @@ const LeafletMapContainer = dynamic(
   }
 );
 
-const LeafletMapInner = ({ data, selectedLocation }) => {
+const LeafletMapInner = ({ data, pickedLocation, editMarkerFunc }) => {
   const { map } = useMapContext();
   const {
     width: viewportWidth,
@@ -85,11 +82,11 @@ const LeafletMapInner = ({ data, selectedLocation }) => {
           >
             {!isLoading ? (
               <>
-                <CenterToMarkerButton
-                  center={allMarkersBoundCenter.centerPos}
-                  zoom={allMarkersBoundCenter.minZoom}
+                <MapToggleButtons
+                  centerPos={allMarkersBoundCenter.centerPos}
+                  minZoom={allMarkersBoundCenter.minZoom}
                 />
-                <LocateButton />
+
                 {Object.values(data).map((item) => (
                   <LeafletCluster
                     key={`${item.category}-${item.color}-${item.background}`}
@@ -102,10 +99,13 @@ const LeafletMapInner = ({ data, selectedLocation }) => {
                       <CustomMarker
                         place={marker}
                         key={ind}
+                        showLabelInAll={item.showLabelInAll}
+                        dirLabel={item.dirLabel}
                         icon={item.icon}
                         color={item.color}
                         background={item.background}
-                        isSelected={selectedLocation?.id === marker.id}
+                        isSelected={pickedLocation?.id === marker.id}
+                        editMarkerFunc={editMarkerFunc}
                       />
                     ))}
                   </LeafletCluster>
@@ -124,9 +124,9 @@ const LeafletMapInner = ({ data, selectedLocation }) => {
 };
 
 // pass through to get context in <MapInner>
-const Map = ({ data, selectedLocation }) => (
+const Map = ({ data, pickedLocation, editMarkerFunc }) => (
   <LeafleftMapContextProvider>
-    <LeafletMapInner data={data} selectedLocation={selectedLocation} />
+    <LeafletMapInner data={data} pickedLocation={pickedLocation} editMarkerFunc={editMarkerFunc} />
   </LeafleftMapContextProvider>
 );
 

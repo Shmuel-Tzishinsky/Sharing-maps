@@ -7,7 +7,8 @@ import { Search } from "lucide-react";
 const ICONS_PER_ROW = 8; // מספר האייקונים בכל שורה
 const ICON_SIZE = 40; // גודל כל אייקון בתצוגה
 
-const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data, setData }) => {
+const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data, setMapData }) => {
+  if (!data) return;
   const [searchTerm, setSearchTerm] = useState("");
 
   // חישוב ממוּזן (useMemo) למניעת חישוב נוסף בכל רינדור
@@ -17,32 +18,13 @@ const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data,
       .filter(([name]) => name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm]);
 
-  const handleIconChange = (index, iconName) => {
-    setData((items) => {
-      return items.map((item, i) => (i === parseFloat(index) ? { ...item, icon: iconName } : item));
-    });
-  };
-
-  const handleNameChange = (eve, index) => {
-    setData((items) => {
-      return items.map((item, i) =>
-        i === parseFloat(index) ? { ...item, name: eve.target.value } : item
-      );
-    });
-  };
-  const handleColorChange = (eve, index) => {
-    setData((items) => {
-      return items.map((item, i) =>
-        i === parseFloat(index) ? { ...item, color: eve.target.value } : item
-      );
-    });
-  };
-  const handleBackgroundColorChange = (eve, index) => {
-    setData((items) => {
-      return items.map((item, i) =>
-        i === parseFloat(index) ? { ...item, background: eve.target.value } : item
-      );
-    });
+  const handleChange = (index, key, value) => {
+    setMapData((prev) => ({
+      ...prev,
+      data: prev.data.map((item, i) =>
+        i === parseFloat(index) ? { ...item, [key]: value } : item
+      ),
+    }));
   };
 
   return (
@@ -55,11 +37,10 @@ const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data,
           <div className="p-4 bg-gray-50 rounded-lg space-y-4 w-full">
             <input
               type="text"
-              defaultValue={data.name}
-              onChange={(eve) => handleNameChange(eve, isLayerCustomizationOpen)}
+              defaultValue={data.category}
+              onChange={(eve) => handleChange(isLayerCustomizationOpen, "name", eve.target.value)}
               className="w-full font-medium text-gray-900"
             />
-
             <div className="gap-2  flex items-center justify-between ">
               <div className="gap-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2  font-[ProximaNova]">
@@ -70,7 +51,9 @@ const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data,
                     type="color"
                     className="w-full rounded-md bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-300 cursor-pointer"
                     value={data.color}
-                    onChange={(eve) => handleColorChange(eve, isLayerCustomizationOpen)}
+                    onChange={(eve) =>
+                      handleChange(isLayerCustomizationOpen, "color", eve.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -83,13 +66,83 @@ const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data,
                     type="color"
                     value={data.background}
                     className="w-full rounded-md bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-300 cursor-pointer"
-                    onChange={(eve) => handleBackgroundColorChange(eve, isLayerCustomizationOpen)}
+                    onChange={(eve) =>
+                      handleChange(isLayerCustomizationOpen, "background", eve.target.value)
+                    }
                   />
                 </div>
               </div>
             </div>
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">בחר אייקון</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">הצג תווית</label>
+              <div className="flex flex-row">
+                <button
+                  onClick={() => handleChange(isLayerCustomizationOpen, "showLabelInAll", true)}
+                  className="p-2 w-1/3 text-center bg-white border rounded-sm hover:bg-[#dbdada]"
+                  style={{ background: data.showLabelInAll === true && "#3b82f6" }}
+                >
+                  תמיד
+                </button>
+                <button
+                  onClick={() => handleChange(isLayerCustomizationOpen, "showLabelInAll", false)}
+                  className="p-2 w-1/3 text-center bg-white border rounded-sm hover:bg-[#dbdada]"
+                  style={{ background: data.showLabelInAll === false && "#3b82f6" }}
+                >
+                  מוסתר
+                </button>
+                <button
+                  onClick={() => handleChange(isLayerCustomizationOpen, "showLabelInAll", null)}
+                  className="p-2 w-1/3 text-center bg-white border rounded-sm hover:bg-[#dbdada]"
+                  style={{ background: data.showLabelInAll === null && "#3b82f6" }}
+                >
+                  לעולם לא
+                </button>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-gray-700 mb-2">כיוון התווית</label>
+              <div className="flex flex-row flex-wrap">
+                {[
+                  ["auto", "אוטומטי"],
+                  ["top", "למעלה"],
+                  ["center", "אמצע"],
+                  ["left", "שמאל"],
+                  ["right", "ימין"],
+                  ["bottom", "למטה"],
+                ].map((ite, ind) => (
+                  <button
+                    key={ind}
+                    onClick={() => handleChange(isLayerCustomizationOpen, "dirLabel", ite[0])}
+                    className="p-2 w-1/3 text-center bg-white border rounded-sm hover:bg-[#dbdada]"
+                    style={{
+                      background:
+                        (data.dirLabel === ite[0] ||
+                          (!data?.dirLabel?.length && ite[0] == "auto")) &&
+                        "#3b82f6",
+                    }}
+                  >
+                    {ite[1]}
+                  </button>
+                ))}
+                {/* <button
+                  onClick={() => handleChange(isLayerCustomizationOpen, "dirLabel", "top")}
+                  className="p-2 w-1/3 text-center bg-white border rounded-sm hover:bg-[#dbdada]"
+                  style={{
+                    background:
+                      (data.dirLabel === "top" && "#3b82f6") ||
+                      (!data.dirLabel?.includes("top") &&
+                        !data.dirLabel?.includes("right") &&
+                        !data.dirLabel?.includes("l") &&
+                        !data.dirLabel?.includes("b") &&
+                        "#3b82f6"),
+                  }}
+                >
+                  למעלה
+                </button> */}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-gray-700 mb-2">בחר אייקון</label>
 
               {/* תיבת חיפוש */}
               <div className="relative">
@@ -121,7 +174,7 @@ const LayerCustomization = ({ isOpen, setIsOpen, isLayerCustomizationOpen, data,
                   return (
                     <button
                       key={name}
-                      onClick={() => handleIconChange(isLayerCustomizationOpen, name)}
+                      onClick={() => handleChange(isLayerCustomizationOpen, "icon", name)}
                       className={`p-2 rounded-lg hover:bg-gray-100 w-10 h-10 flex items-center justify-center ${
                         data.icon === name ? "bg-blue-100 ring-2 ring-blue-500" : ""
                       }`}
