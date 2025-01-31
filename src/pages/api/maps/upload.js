@@ -3,15 +3,16 @@ import Map from "../../../models/Map";
 
 export default async function handler(req, res) {
   await dbConnect();
-  console.log("🚀 ~ handler ~ req.body:", req.body);
 
   if (req.method === "POST") {
     try {
-      const { mapName, geojson } = req.body;
-      console.log("🚀 ~ handler ~  mapName, geojson:", mapName, geojson);
+      const { name, description, data } = req.body; // Ensure `name` matches the schema
 
-      const newMap = new Map({ mapName, geojson });
-      await newMap.save();
+      if (!name || !data) {
+        return res.status(400).json({ error: "Name and data are required" });
+      }
+
+      const newMap = await Map.create({ name, description, data });
 
       res.status(200).json({ message: "Map uploaded successfully!", mapId: newMap._id });
     } catch (error) {

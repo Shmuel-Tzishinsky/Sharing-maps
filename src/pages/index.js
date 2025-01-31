@@ -1,5 +1,6 @@
 import NavMenu from "#components/common/NavMenu";
-import { useState } from "react";
+import { Link } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const mapsData = [
   { id: 1, name: "מפת תל אביב", client: "לקוח א", status: "מושלם", updatedAt: "2024-01-10" },
@@ -9,9 +10,37 @@ const mapsData = [
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+  const [mapsData, setMapsData] = useState([]);
+  console.log("🚀 ~ HomePage ~ mapsData:", mapsData);
   const filteredMaps = mapsData.filter(
     (map) => map.name.includes(search) || map.client.includes(search)
   );
+
+  useEffect(() => {
+    const getAllRecords = async () => {
+      try {
+        const response = await fetch("/api/maps/getAllRecords", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("🚀 ~ getAllRecords ~ response:", response);
+        if (!response.ok) {
+          throw new Error("Failed to save map data");
+        }
+
+        const result = await response.json();
+        console.log("Map data saved successfully:", result);
+        setMapsData(result.records);
+      } catch (error) {
+        console.error("Error saving map data:", error);
+      }
+    };
+
+    getAllRecords();
+  }, []);
 
   return (
     <div className="p-6 max-w-4xl mx-auto" dir="rtl">
@@ -50,20 +79,29 @@ export default function HomePage() {
       <div className="bg-white shadow rounded-lg p-4">
         <h2 className="text-lg font-semibold mb-2">המפות שלך</h2>
         {filteredMaps.length > 0 ? (
-          filteredMaps.map((map) => (
-            <div
-              key={map.id}
-              className="flex justify-between items-center p-2 border-b hover:bg-gray-100 cursor-pointer"
-            >
-              <div>
-                <p className="font-medium">{map.name}</p>
-                <p className="text-sm text-gray-600">{map.client}</p>
+          filteredMaps.map((map) => {
+            console.log("🚀 ~ HomePage ~ map:", map);
+            return (
+              <div
+                key={map._id}
+                className="flex justify-between items-center p-2 border-b hover:bg-gray-100 cursor-pointer"
+              >
+                <div>
+                  <a
+                    href={`/singleMap/${map._id}`}
+                    value={map.name}
+                    className="font-medium text-blue-900"
+                  >
+                    {map.name}
+                  </a>
+                  {/* <p className="text-sm text-gray-600">{map.client}</p> */}
+                </div>
+                {/* <span className={map.status === "מושלם" ? "text-green-600" : "text-yellow-600"}>
+                	{map.status}
+              	</span> */}
               </div>
-              <span className={map.status === "מושלם" ? "text-green-600" : "text-yellow-600"}>
-                {map.status}
-              </span>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-gray-500">לא נמצאו מפות.</p>
         )}

@@ -13,6 +13,14 @@ const MarkerSchema = new mongoose.Schema({
     type: [Number], // [longitude, latitude]
     required: true,
   },
+  showLabel: {
+    type: Boolean,
+    default: null,
+  },
+  dirLabel: {
+    type: String,
+    default: "auto",
+  },
   description: String,
   address: String,
   image: String,
@@ -35,6 +43,14 @@ const DataSchema = new mongoose.Schema({
   color: {
     type: String,
     required: true,
+  },
+  showLabelInAll: {
+    type: Boolean,
+    default: null,
+  },
+  dirLabel: {
+    type: String,
+    default: "auto",
   },
   icon: {
     type: String,
